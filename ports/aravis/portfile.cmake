@@ -1,0 +1,79 @@
+if(CMAKE_HOST_WIN32)
+    set(REQUIRED_PATCH "allow_better_dependencies_search.patch")
+else()
+    set(REQUIRED_PATCH "allow_better_dependencies_search_noglib.patch")
+endif()
+
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO AravisProject/aravis
+    REF e49cfe86dfa5e526de1047db876315340cefce2b
+    SHA512 1b93197031f1a4912911c320e88eda67f7c08db1570c22213f5f2ec41f17e17b6f04c513b8990871e07864137da3cf725389da2aceca4035303560f472ea2a83
+    HEAD_REF master
+    PATCHES
+        ${REQUIRED_PATCH}
+)
+
+vcpkg_find_acquire_program(PERL)
+vcpkg_find_acquire_program(PYTHON3)
+get_filename_component(PYTHON3_DIR "${PYTHON3}" DIRECTORY)
+vcpkg_add_to_path("${PYTHON3_DIR}")
+
+if(CMAKE_HOST_WIN32)
+    if(NOT EXISTS ${PYTHON3_DIR}/easy_install${VCPKG_TARGET_EXECUTABLE_SUFFIX})
+        if(NOT EXISTS ${PYTHON3_DIR}/Scripts/pip${VCPKG_TARGET_EXECUTABLE_SUFFIX})
+            get_filename_component(PYTHON3_DIR_NAME "${PYTHON3_DIR}" NAME)
+            vcpkg_download_distfile(GET_PIP
+                URLS "https://bootstrap.pypa.io/3.3/get-pip.py"
+                FILENAME "tools/python/${PYTHON3_DIR_NAME}/get-pip.py"
+                SHA512 92e68525830bb23955a31cb19ebc3021ef16b6337eab83d5db2961b791283d2867207545faf83635f6027f2f7b7f8fee2c85f2cfd8e8267df25406474571c741
+            )
+            execute_process(COMMAND ${PYTHON3_DIR}/python${VCPKG_TARGET_EXECUTABLE_SUFFIX} ${GET_PIP})
+        endif()
+        execute_process(COMMAND ${PYTHON3_DIR}/Scripts/pip${VCPKG_TARGET_EXECUTABLE_SUFFIX} install python-gettext --user)
+    else()
+        execute_process(COMMAND ${PYTHON3_DIR}/easy_install${VCPKG_TARGET_EXECUTABLE_SUFFIX} python-gettext)
+    endif()
+endif()
+
+vcpkg_add_to_path("${CURRENT_INSTALLED_DIR}/tools/gettext")
+vcpkg_add_to_path("${CURRENT_INSTALLED_DIR}/tools/glib")
+
+set(enable_viewer "false")
+if("viewer" IN_LIST FEATURES)
+  set(enable_viewer "true")
+endif()
+
+set(enable_gst_plugin "false")
+if("gst-plugin" IN_LIST FEATURES)
+  set(enable_gst_plugin "true")
+endif()
+
+vcpkg_configure_meson(
+    SOURCE_PATH ${SOURCE_PATH}
+    OPTIONS
+        -Dviewer=${enable_viewer}
+        -Dgst-plugin=${enable_gst_plugin}
+        -Dpacket-socket=false
+        -Dusb=false
+        -Dfast-heartbeat=false
+        -Ddocumentation=false
+        -Dintrospection=false
+)
+
+vcpkg_install_meson()
+vcpkg_copy_pdbs()
+
+file(REMOVE ${CURRENT_PACKAGES_DIR}/debug/bin/arv-fake-gv-camera-0.8${VCPKG_TARGET_EXECUTABLE_SUFFIX})
+file(REMOVE ${CURRENT_PACKAGES_DIR}/debug/bin/arv-tool-0.8${VCPKG_TARGET_EXECUTABLE_SUFFIX})
+file(MAKE_DIRECTORY ${CURRENT_PACKAGES_DIR}/tools/${PORT})
+file(RENAME ${CURRENT_PACKAGES_DIR}/bin/arv-fake-gv-camera-0.8${VCPKG_TARGET_EXECUTABLE_SUFFIX} ${CURRENT_PACKAGES_DIR}/tools/${PORT}/arv-fake-gv-camera-0.8${VCPKG_TARGET_EXECUTABLE_SUFFIX})
+file(RENAME ${CURRENT_PACKAGES_DIR}/bin/arv-tool-0.8${VCPKG_TARGET_EXECUTABLE_SUFFIX} ${CURRENT_PACKAGES_DIR}/tools/${PORT}/arv-tool-0.8${VCPKG_TARGET_EXECUTABLE_SUFFIX})
+vcpkg_copy_tool_dependencies(${CURRENT_PACKAGES_DIR}/tools/${PORT})
+
+if(VCPKG_LIBRARY_LINKAGE STREQUAL static)
+  file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/bin ${CURRENT_PACKAGES_DIR}/debug/bin)
+endif()
+
+file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share)
+file(INSTALL ${SOURCE_PATH}/COPYING DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
