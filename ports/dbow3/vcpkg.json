@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "port-version": 2,
   "description": "DBoW3 is an improved version of the DBow2 library, an open source C++ library for indexing and converting images into a bag-of-word representation.",
-  "supports": "linux",
   "homepage": "https://github.com/rmsalinas/DBow3",
   "license": null,
+  "supports": "linux",
   "dependencies": [
     {
       "name": "opencv",
