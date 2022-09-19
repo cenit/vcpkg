@@ -11,10 +11,10 @@ Si vous n'avez jamais utilisé vcpkg, ou si vous essayez d'utiliser vcpkg, lisez
 Pour une description des commandes disponibles, quand vous avez installé vcpkg, vous pouvez lancer `vcpkg help` ou `vcpkg help [commande]` pour de l'aide spécifique à une commande.
 
 
-* Github: [https://github.com/microsoft/vcpkg](https://github.com/microsoft/vcpkg)
+* GitHub: [https://github.com/microsoft/vcpkg](https://github.com/microsoft/vcpkg)
 * Slack: [https://cppalliance.org/slack/](https://cppalliance.org/slack/), the #vcpkg channel
 * Discord: [\#include \<C++\>](https://www.includecpp.org), le canal #🌏vcpkg
-* Docs: [Documentation](docs/index.md)
+* Docs: [Documentation](docs/README.md)
 
 [![Build Status](https://dev.azure.com/vcpkg/public/_apis/build/status/microsoft.vcpkg.ci?branchName=master)](https://dev.azure.com/vcpkg/public/_build/latest?definitionId=29&branchName=master)
 
@@ -92,7 +92,7 @@ Si vous utilisez CMake avec Visual Studio continuez [ici](#vcpkg-avec-cmake-et-v
 Afin d'utiliser vcpkg en dehors d'un IDE, vous pouvez utiliser le fichier de toolchain :
 
 ```cmd
-> cmake -B [dossier de build] -S . -DCMAKE_TOOLCHAIN_FILE=[chemin vers vcpkg]/scripts/buildsystems/vcpkg.cmake
+> cmake -B [dossier de build] -S . "-DCMAKE_TOOLCHAIN_FILE=[chemin vers vcpkg]/scripts/buildsystems/vcpkg.cmake"
 > cmake --build [dossier de build]
 ```
 
@@ -138,7 +138,7 @@ $ ./vcpkg/vcpkg search [terme de recherche]
 Pour utiliser vcpkg en dehors d'un IDE, vous pouvez utiliser le fichier de toolchain :
 
 ```cmd
-> cmake -B [dossier de build] -S . -DCMAKE_TOOLCHAIN_FILE=[chemin vers vcpkg]/scripts/buildsystems/vcpkg.cmake
+> cmake -B [dossier de build] -S . "-DCMAKE_TOOLCHAIN_FILE=[chemin vers vcpkg]/scripts/buildsystems/vcpkg.cmake"
 > cmake --build [dossier de build]
 ```
 
@@ -238,14 +238,14 @@ Malheureusement, vous devrez le refaire pour chaque projet.
 Quand vous utilisez vcpkg comme un sous-module de votre projet, vous pouvez l'ajouter à votre CMakeLists.txt avant le premier appel de `project()`, au lieu d'utiliser `CMAKE_TOOLCHAIN_FILE` dans les paramètres d'appel de cmake.
 
 ```cmake
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
   CACHE STRING "Vcpkg toolchain file")
 ```
 
 Cela permettra toujours aux gens de ne pas utiliser vcpkg, en passant directement le CMAKE_TOOLCHAIN_FILE, mais cela rendra l'étape de configuration-construction légèrement plus facile.
 
 [getting-started:utiliser-un-paquet]: docs/examples/installing-and-using-packages.md
-[getting-started:integration]: docs/users/integration.md
+[getting-started:integration]: docs/users/buildsystems/integration.md
 [getting-started:git]: https://git-scm.com/downloads
 [getting-started:cmake-tools]: https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools
 [getting-started:linux-gcc]: #installing-linux-developer-tools
@@ -274,7 +274,7 @@ selon le shell que vous utilisez, puis redémarrez la console.
 
 # Exemples
 
-Lisez la [documentation](doc/index.md) pour des instructions plus spécifiques ainsi que [l'installation et l'utilisation des paquets](docs/examples/installing-and-using-packages.md),
+Lisez la [documentation](doc/README.md) pour des instructions plus spécifiques ainsi que [l'installation et l'utilisation des paquets](docs/examples/installing-and-using-packages.md),
 [ajouter un nouveau paquet depuis un fichier zip](docs/examples/packaging-zipfiles.md),
 et [ajouter un nouveau paquet depuis un dépôt GitHub](docs/examples/packaging-github-repos.md).
 

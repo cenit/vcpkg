@@ -5,7 +5,7 @@
 [한국어](README_ko_KR.md)
 [Français](README_fr.md)
 
-Vcpkg ayuda a manejar librerías de C y C++ en Windows, Linux y MacOS.
+Vcpkg ayuda a manejar bibliotecas de C y C++ en Windows, Linux y MacOS.
 Esta herramienta y ecosistema se encuentran en constante evolución ¡Siempre apreciamos contribuciones nuevas!
 
 Si nunca ha usado Vcpkg antes,
@@ -16,34 +16,33 @@ Para una descripción corta de los comandos disponibles,
 una vez instalado Vcpkg puede ejecutar `vcpkg help`, o
 `vcpkg help [comando]` para obtener ayuda específica de un comando.
 
-* Github: [https://github.com/microsoft/vcpkg](https://github.com/microsoft/vcpkg)
-* Slack: [https://cppalliance.org/slack/](https://cppalliance.org/slack/), en el canal #vcpkg
+* ports en: [vcpkg GitHub](https://github.com/microsoft/vcpkg)
+* este programa en: [vcpkg-tool GitHub](https://github.com/microsoft/vcpkg-tool)
+* [Slack](https://cppalliance.org/slack/), en el canal #vcpkg
 * Discord: [\#include \<C++\>](https://www.includecpp.org), en el canal #🌏vcpkg
-* Docs: [Documentación](docs/index.md)
-
-[![Estado de compilación](https://dev.azure.com/vcpkg/public/_apis/build/status/microsoft.vcpkg.ci?branchName=master)](https://dev.azure.com/vcpkg/public/_build/latest?definitionId=29&branchName=master)
+* Docs: [Documentación](docs/README.md)
 
 ## Tabla de contenido
 
-* [Vcpkg: General](#vcpkg-general)
-* [Tabla de contenidos](#tabla-de-contenidos)
-* ["Primeros pasos"](#primeros-pasos)
-  + [Inicio rápido: Windows](#inicio-rápido-windows)
-  + [Inicio rápido: Unix](#inicio-rápido-unix)
-  + [Instalando herramientas de desarrollo en Linux](#instalando-herramientas-de-desarrollo-en-Linux)
-  + [Instalando herramientas de desarrollo en macOS](#instalando-herramientas-de-desarrollo-en-macos)
-    - [Instalando GCC en MacOS previo a 10.15](#instalando-gcc-en-macos-previo-a-10.15)
-  + [Usando Vcpkg con CMake](#usando-vcpkg-con-cmake)
-    - [Visual Studio Code con CMake Tools](#visual-studio-code-con-cmake-tools)
-    - [Vcpkg con proyectos de Visual Studio (CMake)](#vcpkg-con-proyectos-de-visual-studio\(CMake\))
-    - [Vcpkg con CLion](#vcpkg-con-clion)
-    - [Vcpkg como submódulo](#vcpkg-como-submódulo)
-  + [Inicio rápido: archivos de Manifiesto](#inicio-rápido-manifiestos)
-* [Tab-Completado/Autocompletado](#Completado-TabAutocompletado)
-* [Ejemplos](#ejemplos)
-* [Contribuyendo](#contribuyendo)
-* [Licencia](#licencia)
-* [telemetría](#telemetría)
+- [Vcpkg](#vcpkg)
+  - [Tabla de contenido](#tabla-de-contenido)
+  - [Primeros pasos](#primeros-pasos)
+    - [Inicio Rápido: Windows](#inicio-rápido-windows)
+    - [Inicio rápido: Unix](#inicio-rápido-unix)
+    - [Instalando Herramientas de desarrollo en Linux](#instalando-herramientas-de-desarrollo-en-linux)
+    - [Instalando Herramientas de desarrollo en macOS](#instalando-herramientas-de-desarrollo-en-macos)
+    - [Usando Vcpkg con CMake](#usando-vcpkg-con-cmake)
+      - [Visual Studio Code con CMake Tools](#visual-studio-code-con-cmake-tools)
+      - [Vcpkg con proyectos de Visual Studio(CMake)](#vcpkg-con-proyectos-de-visual-studiocmake)
+      - [Vcpkg con CLion](#vcpkg-con-clion)
+      - [Vcpkg como Submódulo](#vcpkg-como-submódulo)
+    - [Inicio rápido: Manifiestos](#inicio-rápido-manifiestos)
+  - [Completado-Tab/Autocompletado](#completado-tabautocompletado)
+  - [Ejemplos](#ejemplos)
+  - [Contribuyendo](#contribuyendo)
+  - [Licencia](#licencia)
+- [Seguridad](#seguridad)
+  - [Telemetría](#telemetría)
 
 ## Primeros pasos
 
@@ -51,7 +50,7 @@ Antes de iniciar, siga la guía ya sea para [Windows](#inicio-rápido-windows),
 o [macOS y Linux](#inicio-rápido-unix) dependiendo del SO que use.
 
 Para más información, ver [Instalando y Usando Paquetes][getting-started:using-a-package].
-Si una librería que necesita no está presente en el catálogo de vcpkg,
+Si una biblioteca que necesita no está presente en el catálogo de vcpkg,
 puede [abrir una incidencia en el repositorio de GitHub][contributing:submit-issue] 
 donde el equipo de vcpkg y la comunidad pueden verlo, y potencialmente hacer un port a vcpkg.
 
@@ -82,13 +81,13 @@ ya que de otra forma puede encontrarse problemas de ruta para algunos sistemas d
 > .\vcpkg\bootstrap-vcpkg.bat
 ```
 
-Para instalar las librerías para su proyecto, ejecute:
+Para instalar las bibliotecas para su proyecto, ejecute:
 
 ```cmd
 > .\vcpkg\vcpkg install [paquetes a instalar]
 ```
 
-también puede buscar librerías que necesite usar el comando `search`:
+también puede buscar bibliotecas que necesite usar el comando `search`:
 
 ```cmd
 > .\vcpkg\vcpkg search [término de búsqueda]
@@ -102,7 +101,7 @@ ejecute el siguiente comando (puede requerir privilegios de administrador):
 ```
 
 Después de esto, puede crear un nuevo proyecto que no sea de CMake(MSBuild) o abrir uno existente.
-Todas las librerías estarán listas para ser incluidas y
+Todas las bibliotecas estarán listas para ser incluidas y
 usadas en su proyecto sin configuración adicional.
 
 Si está usando CMake con Visual Studio,
@@ -112,11 +111,11 @@ Para utilizar Vcpkg con CMake sin un IDE,
 puede utilizar el archivo de herramientas incluido:
 
 ```cmd
-> cmake -B [directorio de compilación] -S . -DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
+> cmake -B [directorio de compilación] -S . "-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake"
 > cmake --build [directorio de compilación]
 ```
 
-Con CMake, todavía necesitara `find_package` y las configuraciones adicionales de la librería.
+Con CMake, todavía necesitara `find_package` y las configuraciones adicionales de la biblioteca.
 Revise la [Sección de Cmake](#usando-vcpkg-con-cmake) para más información,
 incluyendo el uso de CMake con un IDE.
 
@@ -133,9 +132,6 @@ Prerrequisitos para Linux:
 Prerrequisitos para macOS:
 
 - [Herramientas de desarrollo de Apple][getting-started:macos-dev-tools]
-- En macOS 10.14 o inferior, también necesita:
-  - [Homebrew][getting-started:macos-brew]
-  - [g++][getting-started:macos-gcc] >= 6 de Homebrew
 
 Primero, descargue y compile vcpkg, puede ser instalado donde sea,
 pero recomendamos usar vcpkg como submodulo para proyectos de CMake.
@@ -145,13 +141,25 @@ $ git clone https://github.com/microsoft/vcpkg
 $ ./vcpkg/bootstrap-vcpkg.sh
 ```
 
-Para instalar las librerías para su proyecto, ejecute:
+Para instalar las bibliotecas para su proyecto, ejecute:
 
 ```sh
 $ ./vcpkg/vcpkg install [paquetes a instalar]
 ```
 
-También puede buscar las librerías que necesita con el subcomando `search`:
+Nota: por defecto se instalarán las bibliotecas x86, para instalar x64, ejecute:
+
+```cmd
+> .\vcpkg\vcpkg install [paquete a instalar]:x64-windows
+```
+
+O si desea instalar varios paquetes:
+
+```cmd
+> .\vcpkg\vcpkg install [paquetes a instalar] --triplet=x64-windows
+```
+
+También puede buscar las bibliotecas que necesita con el subcomando `search`:
 
 ```sh
 $ ./vcpkg/vcpkg search [término de búsqueda]
@@ -160,11 +168,11 @@ $ ./vcpkg/vcpkg search [término de búsqueda]
 Para usar vcpkg con CMake, tiene que usar el siguiente archivo toolchain:
 
 ```sh
-$ cmake -B [directorio de compilación] -S . -DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
+$ cmake -B [directorio de compilación] -S . "-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake"
 $ cmake --build [directorio de compilación]
 ```
 
-Con CMake, todavía necesitara `find_package` y las configuraciones adicionales de la librería.
+Con CMake, todavía necesitara `find_package` y las configuraciones adicionales de la biblioteca.
 Revise la [Sección de CMake](#usando-vcpkg-con-cmake)
 para más información en cómo aprovechar mejor Vcpkg con CMake,
 y CMake tools para VSCode.
@@ -205,25 +213,6 @@ $ xcode-select --install
 
 Luego seguir los pasos que aparecerán en las ventanas que se muestran.
 
-En macOS 10.14 y previos, también requiere instalar g++ de homebrew;
-siguiendo los pasos en la sección siguiente.
-
-#### Instalando GCC en macOS previo a 10.15
-
-Este paso _solo_  es requerido si está usando una versión de macOS previa a 10.15.
-Instalar homebrew debería ser sencillo; visite <brew.sh> para mas información,
-pero de manera simple, ejecute el siguiente comando:
-
-```sh
-$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-```
-
-luego, para obtener una versión actualizada de gcc, ejecute el comando:
-
-```sh
-$ brew install gcc
-```
-
 Posteriormente podrá compilar vcpkg junto con la [guía de inicio rápido](#inicio-rápido-unix)
 
 ### Usando Vcpkg con CMake
@@ -233,7 +222,7 @@ Posteriormente podrá compilar vcpkg junto con la [guía de inicio rápido](#ini
 #### Visual Studio Code con CMake Tools
 
 Agregando lo siguiente al espacio de trabajo `settings.json` permitirá que
-CMake Tools use automáticamente Vcpkg para las librerías:
+CMake Tools use automáticamente Vcpkg para las bibliotecas:
 
 ```json
 {
@@ -272,7 +261,7 @@ puede agregar lo siguiente as su CMakeLists,txt antes de la primera llamada a `p
 en vez de pasar `CMAKE_TOOLCHAIN_FILE` a la invocación de CMake.
 
 ```cmake
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
   CACHE STRING "Vcpkg toolchain file")
 ```
 
@@ -318,7 +307,7 @@ cree un archivo llamado `vcpkg.json`, y escriba lo siguiente:
 }
 ```
 
-Las librerías serán instaladas en el directorio `vcpkg_installed`,
+Las bibliotecas serán instaladas en el directorio `vcpkg_installed`,
 en el mismo directorio que su `vcpkg.json`.
 Si puede usar el regular conjunto de herramientas de CMake,
 o mediante la integración de Visual Studio/MSBuild,
@@ -330,13 +319,11 @@ puede usar un simple `vcpkg install --feature-flags=manifests`
 Para más información, revise la especificación de [manifiesto][getting-started:manifest-spec]
 
 [getting-started:using-a-package]: docs/examples/installing-and-using-packages.md
-[getting-started:integration]: docs/users/integration.md
+[getting-started:integration]: docs/users/buildsystems/integration.md
 [getting-started:git]: https://git-scm.com/downloads
 [getting-started:cmake-tools]: https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools
-[getting-started:linux-gcc]: #installing-linux-developer-tools
-[getting-started:macos-dev-tools]: #installing-macos-developer-tools
-[getting-started:macos-brew]: #installing-gcc-on-macos
-[getting-started:macos-gcc]: #installing-gcc-on-macos
+[getting-started:linux-gcc]: #Instalando-Herramientas-de-desarrollo-en-Linux
+[getting-started:macos-dev-tools]: #Instalando-Herramientas-de-desarrollo-en-macOS
 [getting-started:visual-studio]: https://visualstudio.microsoft.com/
 [getting-started:manifest-spec]: docs/specifications/manifests.md
 
@@ -353,19 +340,21 @@ para activar el autocompletado en la terminal de elección ejecute:
 o
 
 ```sh
-$ ./vcpkg integrate bash
+$ ./vcpkg integrate bash # o zsh
 ```
 
 según la terminal que use, luego reinicie la consola.
 
 ## Ejemplos
 
-ver la [documentación](docs/index.md) para tutoriales específicos, incluyendo
+ver la [documentación](docs/README.md) para tutoriales específicos, incluyendo
 [instalando y usando un paquete](docs/examples/installing-and-using-packages.md),
 [agregando un nuevo paquete desde un archivo comprimido](docs/examples/packaging-zipfiles.md),
 [agregando un nuevo paquete desde un repositorio en GitHub](docs/examples/packaging-github-repos.md).
 
-Nuestra documentación se encuentra online en ReadTheDocs: <https://vcpkg.readthedocs.io/>!
+Nuestra documentación también esta disponible en nuestro sitio web [vcpkg.io](https://vcpkg.io/).
+Si necesita ayuda puede [crear un incidente](https://github.com/vcpkg/vcpkg.github.io/issues).
+¡Apreciamos cualquier retroalimentación!
 
 Ver un [video de demostración](https://www.youtube.com/watch?v=y41WFKbQFTw) de 4 minutos.
 
@@ -392,13 +381,25 @@ con cualquier pregunta adicional o comentarios.
 ## Licencia
 
 El código en este repositorio se encuentra licenciado mediante la [Licencia MIT](LICENSE.txt).
+Las bibliotecas proveídas por los `ports` están licenciadas mediante los terminos de los autores originales.
+Donde estén disponibles, vcpkg almacena las licencias asociadas en la siguiente ubicación `installed/<triplet>/share/<port>/copyright`.
+
+# Seguridad
+
+La mayoría de los `ports` en vcpkg construyen las bibliotecas usando su sistema de compilación preferido
+por los autores originales de las bibliotecas, y descargan el código fuente asi como las herramientas de compilación
+de sus ubicaciones de distribucion oficiales. Para aquellos que usan un firewall, el acceso dependerá de cuales `ports`
+están siendo instalados. Si tiene que instalarlos en un entorno aislado, puede instalarlos previamente en un entorno
+no aislado, generando un [caché del paquete](docs/users/assetcaching.md) compartido con el entorno aislado.
 
 ## Telemetría
 
 vcpkg recolecta datos de uso para mejorar su experiencia.
 La información obtenida por Microsoft es anónima.
-puede ser dado de baja de la telemetría ejecutando de nuevo el script `bootstrap-vcpkg` con `-disableMetrics`,
-pasando `--disable-metrics` a vcpkg en la línea de comandos,
-o creando la variable de entorno `VCPKG_DISABLE_METRICS`.
+puede ser dado de baja de la telemetría realizando lo siguiente:
+
+- ejecutar el script `bootstrap-vcpkg` con el parametro `-disableMetrics`
+- agregar el parametro `--disable-metrics` a vcpkg en la línea de comandos
+- agregar la variable de entorno `VCPKG_DISABLE_METRICS`
 
 Se puede leer más sobre la telemetría de vcpkg en docs/about/privacy.md

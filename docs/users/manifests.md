@@ -1,37 +1,65 @@
 # Manifest Mode
 
-vcpkg has two modes of operation - classic mode and manifest mode.
+**The latest version of this documentation is available on [GitHub](https://github.com/Microsoft/vcpkg/tree/master/docs/users/manifests.md).**
 
-In classic mode, vcpkg produces an "installed" tree,
-whose contents are changed by explicit calls to `vcpkg install` or `vcpkg remove`.
-The installed tree is intended for consumption by any number of projects:
-for example, installing a bunch of libraries and then using those libraries from Visual Studio,
-without additional configuration.
-Because the installed tree is not associated with an individual project,
-it's similar to tools like `brew` or `apt`,
-except that the installed tree is vcpkg-installation-local,
-rather than global to a system or user.
+vcpkg has two modes of consuming dependencies - classic mode and manifest mode.
 
-In manifest mode, an installed tree is associated with a particular project rather than the vcpkg installation.
-The set of installed ports is controlled by editing the project's "manifest file",
-and the installed tree is placed in the project directory or build directory.
-This mode acts more similarly to language package managers like Cargo, or npm. 
-We recommend using this manifest mode whenever possible,
-because it allows one to encode a project's dependencies explicitly in a project file,
-rather than in the documentation, making your project much easier to consume.
+In classic mode, vcpkg produces an "installed" tree, whose contents are changed by explicit calls to `vcpkg install` or
+`vcpkg remove`. The installed tree is intended for consumption by any number of projects: for example, installing a
+bunch of libraries and then using those libraries from Visual Studio, without additional configuration. Because the
+installed tree is not associated with an individual project, it's similar to tools like `brew` or `apt`, except that the
+installed tree is vcpkg-installation-local, rather than global to a system or user.
 
-Manifest mode is in beta, but one can use it from the CMake integration,
-which will be stable when used via things like `find_package`.
-This is the recommended way to use manifest mode.
-
-In this document, we have basic information on [Writing a Manifest](#writing-a-manifest),
-the [vcpkg Command Line Interface](#command-line-interface),
-and a little more information on [CMake](#cmake-integration) integration.
+In manifest mode, an installed tree is associated with a particular project rather than the vcpkg installation. The set
+of installed ports is controlled by editing the project's "manifest file", and the installed tree is placed in the
+project directory or build directory. This mode acts more similarly to language package managers like Cargo, or npm. We
+recommend using this manifest mode whenever possible, because it allows one to encode a project's dependencies
+explicitly in a project file, rather than in the documentation, making your project much easier to consume.
 
 Check out the [manifest cmake example](../examples/manifest-mode-cmake.md) for an example project using CMake and
 manifest mode.
 
-## Writing a Manifest
+## Table of Contents
+
+- [Simple Example Manifest](#simple-example-manifest)
+- [Manifest Syntax Reference](#manifest-syntax-reference)
+  - [`"name"`](#name)
+  - [Version Fields](#version-fields)
+  - [`"description"`](#description)
+  - [`"builtin-baseline"`](#builtin-baseline)
+  - [`"dependencies"`](#dependencies)
+    - [`"name"`](#dependencies-name)
+    - [`"default-features"`](#dependencies-default-features)
+    - [`"features"`](#dependencies-features)
+    - [`"platform"`](#platform)
+    - [`"version>="`](#version-gt)
+  - [`"overrides"`](#overrides)
+  - [`"supports"`](#supports)
+  - [`"features"`](#features)
+  - [`"default-features"`](#default-features)
+
+See also [the original specification](../specifications/manifests.md) for more low-level details.
+
+## Simple Example Manifest
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "my-application",
+  "version": "0.15.2",
+  "dependencies": [
+    "boost-system",
+    {
+      "name": "cpprestsdk",
+      "default-features": false
+    },
+    "libxml2",
+    "yajl"
+  ]
+}
+```
+
+## Manifest Syntax Reference
 
 A manifest is a JSON-formatted file named `vcpkg.json` which lies at the root of your project.
 It contains all the information a person needs to know to get dependencies for your project,
@@ -44,6 +72,8 @@ These comment fields are not allowed in any objects which permit user-defined ke
 Each manifest contains a top level object with the fields documented below; the most important ones are
 [`"name"`](#name), the [version fields](#version-fields), and [`"dependencies"`](#dependencies):
 
+<a id="name"></a>
+
 ### `"name"`
 
 This is the name of your project! It must be formatted in a way that vcpkg understands - in other words,
@@ -52,23 +82,29 @@ For example, `Boost.Asio` might be given the name `boost-asio`.
 
 This is a required field.
 
-### Version fields
+### Version Fields
 
-There is, at this point, only one version field - `"version-string"`. However, more will be added in the future.
-You must have one (and only one) version field. There are different reasons to use each version field:
+There are four version field options, depending on how the port orders its
+releases.
 
-* `"version-string"` - used for packages that don't have orderable versions. This is pretty uncommon,
-  but since we don't have any versioning constraints yet, this is the only one that you can use.
+* [`"version"`](versioning.md#version) - Generic, dot-separated numeric
+  sequence.
+* [`"version-semver"`](versioning.md#version-semver) - [Semantic Version
+  2.0.0](https://semver.org/#semantic-versioning-specification-semver)
+* [`"version-date"`](versioning.md#version-date) - Used for packages which do
+  not have numeric releases (for example, Live-at-HEAD). Matches `YYYY-MM-DD`
+  with optional trailing dot-separated numeric sequence.
+* [`"version-string"`](versioning.md#version-string) - Used for packages that
+  don't have orderable versions. This should be rarely used, however all ports
+  created before the other version fields were introduced use this scheme.
 
-Additionally, the `"port-version"` field is used by registries of packages,
-as a way to version "the package gotten from `vcpkg install`" differently from the upstream package version.
-You shouldn't need to worry about this at all.
+Additionally, the optional `"port-version"` field is used to indicate revisions
+to the port with the same upstream source version. For pure consumers, this
+field should not be used.
 
-#### Additional version fields
+See [versioning](versioning.md#version-schemes) for more details.
 
-**Experimental behind the `versions` feature flag**
-
-See [versioning.md](versioning.md#version%20schemes) for additional version types.
+<a id="description"></a>
 
 ### `"description"`
 
@@ -77,13 +113,26 @@ This can be a single string, or it can be an array of strings;
 in the latter case, the first string is treated as a summary,
 while the remaining strings are treated as the full description.
 
+<a id="builtin-baseline"></a>
+
 ### `"builtin-baseline"`
 
-**Experimental behind the `versions` feature flag**
+This field indicates the commit of vcpkg which provides global minimum version
+information for your manifest.
 
-This field indicates the commit of vcpkg which provides global minimum version information for your manifest. It is required for top-level manifest files using versioning.
+It is required for top-level manifest files using versioning without a specified [`"default-registry"`](registries.md#configuration-default-registry). It has the same semantic as defining your default registry to be:
+```json
+{
+  "default-registry": {
+    "kind": "builtin",
+    "baseline": "<value>"
+  }
+}
+```
 
-See also [versioning](versioning.md#builtin-baseline) for more semantic details.
+See [versioning](versioning.md#baselines) for more semantic details.
+
+<a id="dependencies"></a>
 
 ### `"dependencies"`
 
@@ -95,13 +144,34 @@ if they were to use you). It's an array of strings and objects:
 * On the other hand, an object dependency (e.g., `"dependencies": [ { "name": "zlib" } ]`)
   allows you to add that extra information.
 
-An object dependency can have the following fields:
+#### Example:
 
-#### `"name"`
+```json
+"dependencies": [
+  {
+    "name": "arrow",
+    "default-features": false,
+    "features": [ "json" ]
+  },
+  "boost-asio",
+  "openssl",
+  {
+    "name": "picosha2",
+    "platform": "!windows"
+  }
+]
+```
+
+<a id="dependencies-name"></a>
+
+#### `"name"` Field
 
 The name of the dependency. This follows the same restrictions as the [`"name"`](#name) property for a project.
 
-#### `"features"` and `"default-features"`
+<a id="dependencies-default-features"></a>
+<a id="dependencies-features"></a>
+
+#### `"features"` and `"default-features"` Fields
 
 `"features"` is an array of feature names which tell you the set of features that the
 dependencies need to have at a minimum,
@@ -120,7 +190,9 @@ Then, you might just ask for:
 }
 ```
 
-#### `"platform"`
+<a id="platform"></a>
+
+#### `"platform"` Field
 
 The `"platform"` field defines the platforms where the dependency should be installed - for example,
 you might need to use sha256, and so you use platform primitives on Windows, but `picosha2` on non-Windows platforms.
@@ -145,55 +217,38 @@ The common identifiers are:
 
 although one can define their own.
 
-#### `"version>="`
+<a id="version-gt"></a>
 
-**Experimental behind the `versions` feature flag**
+#### `"version>="` Field
 
 A minimum version constraint on the dependency.
 
-This field specifies the minimum version of the dependency using a '#' suffix to denote port-version if non-zero.
+This field specifies the minimum version of the dependency, optionally using a
+`#N` suffix to denote port-version if non-zero.
 
-See also [versioning](versioning.md#constraints) for more semantic details.
+See also [versioning](versioning.md#version-1) for more semantic details.
 
-#### Example:
-
-```json
-{
-  "dependencies": [
-    {
-      "name": "arrow",
-      "default-features": false,
-      "features": [ "json" ]
-    },
-    "boost-asio",
-    "openssl",
-    {
-      "name": "picosha2",
-      "platform": "!windows"
-    }
-  ]
-}
-```
+<a id="overrides"></a>
 
 ### `"overrides"`
 
-**Experimental behind the `versions` feature flag**
+This field pins exact versions for individual dependencies.
 
-This field enables version resolution to be ignored for certain dependencies and to use specific versions instead.
+`"overrides"` from transitive manifests (i.e. from dependencies) are ignored.
 
 See also [versioning](versioning.md#overrides) for more semantic details.
 
 #### Example:
 
 ```json
-{
   "overrides": [
     {
       "name": "arrow", "version": "1.2.3", "port-version": 7
     }
   ]
-}
 ```
+
+<a id="supports"></a>
 
 ### `"supports"`
 
@@ -202,6 +257,8 @@ It uses the same platform expressions as [`"platform"`](#platform), from depende
 `"supports"` field of features.
 For example, if your library doesn't support linux, you might write `{ "supports": "!linux" }`.
 
+<a id="default-features"></a>
+<a id="features"></a>
 
 ### `"features"` and `"default-features"`
 
@@ -219,9 +276,10 @@ and that's the `"default-features"` field, which is an array of feature names.
 
 #### Example:
 
-```
+```json
 {
   "name": "libdb",
+  "version": "1.0.0",
   "description": [
     "An example database library.",
     "Optionally can build with CBOR, JSON, or CSV as backends."
@@ -248,57 +306,12 @@ and that's the `"default-features"` field, which is an array of feature names.
         "fast-cpp-csv-parser"
       ]
     },
-    "gui": {
-      "description": "The GUI libdb database viewer.",
-      "supports": "windows | osx"
-    }
     "json": {
       "description": "The JSON backend",
       "dependencies": [
         "jsoncons"
       ]
-    },
+    }
   }
 }
 ```
-
-## Command Line Interface
-
-The command line interface around the new manifest mode is pretty simple.
-There's only one command that one really needs to worry about, `vcpkg install`,
-although `vcpkg search` is still useful.
-Since manifest mode is still in beta, you'll need to pass a feature flag: `manifests`.
-There are a few ways to pass this feature flag:
-
-* `--feature-flags` option: On any vcpkg command, you can pass `--feature-flags=manifests`
-* `VCPKG_FEATURE_FLAGS` environment variable: one can set the environment variable `VCPKG_FEATURE_FLAGS` to
-  `manifests`.
-
-### `vcpkg install`
-
-Once one has written a manifest file,
-they can run `vcpkg install` in any subdirectory of the directory containing `vcpkg.json`.
-It will install all of the dependencies for the default triplet into
-`<directory containing vcpkg.json>/vcpkg_installed`.
-If you want to switch the triplet (for example, this is very common on windows, where the default triplet is x86-windows, not x64-windows),
-you can pass it with the `--triplet` option: `vcpkg install --triplet x64-windows` (or whatever).
-Then, vcpkg will install all the dependencies, and you're ready to go!
-
-## CMake Integration
-
-The CMake integration acts exactly like the existing CMake integration.
-One passes the toolchain file, located at `[vcpkg root]/scripts/buildsystems/vcpkg.cmake`,
-to the CMake invocation via the `CMAKE_TOOLCHAIN_FILE` variable.
-Then, CMake will install all dependencies into the build directory, and you're good!
-It ends up that you only have to run CMake, and vcpkg is called only as part of the build process.
-Unlike bare vcpkg, the feature flag is not required,
-since the CMake integration won't break as long as you depending on the exact naming of vcpkg's installed directory.
-
-### Example:
-
-```
-> cmake -B builddir -S . -DCMAKE_TOOLCHAIN_FILE=[vcpkg root]/scripts/buildsystems/vcpkg.cmake
-> cmake --build builddir
-```
-
-with a `vcpkg.json` in the same directory as `CMakeLists.txt` should Just Work!

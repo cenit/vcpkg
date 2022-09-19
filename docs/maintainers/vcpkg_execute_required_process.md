@@ -1,5 +1,7 @@
 # vcpkg_execute_required_process
 
+The latest version of this document lives in the [vcpkg repo](https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_execute_required_process.md).
+
 Execute a process with logging and fail the build if the command fails.
 
 ## Usage
@@ -11,11 +13,12 @@ vcpkg_execute_required_process(
     [TIMEOUT <seconds>]
     [OUTPUT_VARIABLE <var>]
     [ERROR_VARIABLE <var>]
+    [SAVE_LOG_FILES <relative-path> [<relative-path>...]]
 )
 ```
 ## Parameters
 ### ALLOW_IN_DOWNLOAD_MODE
-Allows the command to execute in Download Mode.  
+Allows the command to execute in Download Mode.
 [See execute_process() override](../../scripts/cmake/execute_process.cmake).
 
 ### COMMAND
@@ -38,6 +41,14 @@ Optional variable to receive stderr of the command.
 
 This should be a unique name for different triplets so that the logs don't conflict when building multiple at once.
 
+### SAVE_LOG_FILES
+
+Optional files to be moved from the working directory to `${CURRENT_BUILDTREES_DIR}`.
+The files are copied even if the process failed. 
+The target file names are constructed from the `LOGNAME` parameter and the source filename.
+If the target file name doesn't end in `.log`, this suffix is appended.
+This helps to collect relevant log files in CI setups.
+
 ## Examples
 
 * [ffmpeg](https://github.com/Microsoft/vcpkg/blob/master/ports/ffmpeg/portfile.cmake)
@@ -46,4 +57,4 @@ This should be a unique name for different triplets so that the logs don't confl
 * [qt5](https://github.com/Microsoft/vcpkg/blob/master/ports/qt5/portfile.cmake)
 
 ## Source
-[scripts/cmake/vcpkg_execute_required_process.cmake](https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_execute_required_process.cmake)
+[scripts/cmake/vcpkg\_execute\_required\_process.cmake](https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_execute_required_process.cmake)

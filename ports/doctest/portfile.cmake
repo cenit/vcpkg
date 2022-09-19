@@ -1,21 +1,22 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO onqtam/doctest
-    REF 1c8da00c978c19e00a434b2b1f854fcffc9fba35 #version 2.4.0
-    SHA512 aa0d10a0fbd6d3b9f89c3d909bce332804610390a310c3f6ac89c44c76a07f00a8770d30d6481627572bdbd9dabccfe6c6f9f7b5fb6b323bf5120ec623dd358f
+    REPO doctest/doctest
+    REF v2.4.9
+    SHA512 c7337e2de371c18973a0f4cb76458d6ae387e78874c9bc8aa367ffd2d592514b774e7c5ebf44f83b7046f6b33c6905fd079c36f4c33eadf52b3d651d978182cb
     HEAD_REF master
 )
 
-vcpkg_configure_cmake(
-    SOURCE_PATH ${SOURCE_PATH}
-    PREFER_NINJA
+vcpkg_cmake_configure(
+    SOURCE_PATH "${SOURCE_PATH}"
+    DISABLE_PARALLEL_CONFIGURE
     OPTIONS
         -DDOCTEST_WITH_TESTS=OFF
 )
 
-vcpkg_install_cmake()
-vcpkg_fixup_cmake_targets(CONFIG_PATH lib/cmake/doctest)
+vcpkg_cmake_install()
 
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/lib)
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug)
-configure_file(${SOURCE_PATH}/LICENSE.txt ${CURRENT_PACKAGES_DIR}/share/${PORT}/copyright COPYONLY)
+vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/${PORT})
+
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug" "${CURRENT_PACKAGES_DIR}/lib")
+
+file(INSTALL "${SOURCE_PATH}/LICENSE.txt" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
