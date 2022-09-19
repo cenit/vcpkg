@@ -12,7 +12,12 @@
     },
     "gettext",
     "glib",
-    "libxml2"
+    "libusb",
+    "libxml2",
+    {
+      "name": "vcpkg-get-python-packages",
+      "host": true
+    }
   ],
   "features": {
     "viewer": {

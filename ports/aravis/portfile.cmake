@@ -1,9 +1,3 @@
-if(CMAKE_HOST_WIN32)
-    set(REQUIRED_PATCH "allow_better_dependencies_search.patch")
-else()
-    set(REQUIRED_PATCH "allow_better_dependencies_search_noglib.patch")
-endif()
-
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO AravisProject/aravis
@@ -11,7 +5,7 @@ vcpkg_from_github(
     SHA512 585479529282e72d8515d46d5d0be3783c5bad57481f8b4f8bcbf702120280149f4c5dea41330225ec00243ff7ab0e411d43312ae7e74142b788d3e45270cb5c
     HEAD_REF master
     PATCHES
-        ${REQUIRED_PATCH}
+        0001-use-vcpkg-ports.patch
 )
 
 vcpkg_find_acquire_program(PERL)
