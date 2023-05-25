@@ -66,6 +66,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
 )
 
 set(USE_QT_VERSION "5")
+set(ENABLE_CXX11 ON)
 
 # Cannot use vcpkg_check_features() for "dnn", "gtk", ipp", "openmp", "ovis", "python", "qt", "tbb"
 set(BUILD_opencv_dnn OFF)
@@ -280,6 +281,7 @@ if("ffmpeg" IN_LIST FEATURES)
 endif()
 
 if("halide" IN_LIST FEATURES)
+  set(ENABLE_CXX11 OFF)
   list(APPEND ADDITIONAL_BUILD_FLAGS
     # Halide 13 requires C++17
     "-DCMAKE_CXX_STANDARD=17"
@@ -367,7 +369,7 @@ vcpkg_cmake_configure(
         -DCMAKE_DISABLE_FIND_PACKAGE_Git=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_JNI=ON
         # ENABLE
-        -DENABLE_CXX11=ON
+        -DENABLE_CXX11=${ENABLE_CXX11}
         ###### OPENCV vars
         "-DOPENCV_DOWNLOAD_PATH=${DOWNLOADS}/opencv-cache"
         ${BUILD_WITH_CONTRIB_FLAG}
@@ -396,6 +398,7 @@ vcpkg_cmake_configure(
         ###### Additional build flags
         ${ADDITIONAL_BUILD_FLAGS}
         -DBUILD_IPP_IW=${WITH_IPP}
+        -DOPENCV_LAPACK_FIND_PACKAGE_ONLY=ON
 )
 
 vcpkg_cmake_install()
