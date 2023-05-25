@@ -1,7 +1,7 @@
 {
   "name": "opencv4",
   "version": "4.7.0",
-  "port-version": 3,
+  "port-version": 4,
   "description": "computer vision library",
   "homepage": "https://github.com/opencv/opencv",
   "license": "Apache-2.0",
@@ -24,6 +24,9 @@
     "default-features"
   ],
   "features": {
+    "calib3d": {
+      "description": "build calib3d module"
+    },
     "ade": {
       "description": "graph api",
       "dependencies": [
@@ -82,8 +85,13 @@
           "name": "opencv4",
           "default-features": false,
           "features": [
+            "calib3d",
             "dnn",
+            "highgui",
+            "intrinsics",
             "jpeg",
+            "opencl",
+            "pch",
             "png",
             "quirc",
             "tiff",
@@ -97,8 +105,20 @@
             "gtk"
           ],
           "platform": "linux"
+        },
+        {
+          "name": "opencv4",
+          "default-features": false,
+          "features": [
+            "directx",
+            "dshow"
+          ],
+          "platform": "windows"
         }
       ]
+    },
+    "directx": {
+      "description": "build using directx backend acceleration"
     },
     "dnn": {
       "description": "Enable dnn module",
@@ -118,6 +138,15 @@
           ]
         }
       ]
+    },
+    "disable-fs": {
+      "description": "disable file system support"
+    },
+    "disable-thread": {
+      "description": "disable threading support"
+    },
+    "dshow": {
+      "description": "build using dshow backend acceleration"
     },
     "eigen": {
       "description": "Eigen support for opencv",
@@ -197,6 +226,12 @@
         }
       ]
     },
+    "highgui": {
+      "description": "build gui for the platform"
+    },
+    "intrinsics": {
+      "description": "enable usage of processor intrinsics"
+    },
     "ipp": {
       "description": "Enable Intel Integrated Performance Primitives"
     },
@@ -221,6 +256,9 @@
     },
     "nonfree": {
       "description": "allow nonfree and unredistributable libraries"
+    },
+    "opencl": {
+      "description": "enable opencl support"
     },
     "openexr": {
       "description": "OpenEXR support for opencv",
@@ -249,6 +287,9 @@
           ]
         }
       ]
+    },
+    "pch": {
+      "description": "enable usage of pre-compiled headers"
     },
     "png": {
       "description": "PNG support for opencv",
@@ -335,6 +376,9 @@
       "dependencies": [
         "libwebp"
       ]
+    },
+    "win32-ui": {
+      "description": "build gui using win32 api"
     },
     "world": {
       "description": "Compile to a single package support for opencv"

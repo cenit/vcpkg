@@ -1,12 +1,7 @@
-file(READ "${CMAKE_CURRENT_LIST_DIR}/vcpkg.json" _contents)
-string(JSON OPENCV_VERSION GET "${_contents}" version)
-
-set(USE_QT_VERSION "5")
-
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO opencv/opencv
-    REF ${OPENCV_VERSION}
+    REF ${VERSION}
     SHA512 96bbeb9525325f17ba635a0b75126aae0a7b0daef211af45057a97abd5d31a57fc50f0e889a6dab614df9b7621a145e06c0d240f0a218f33df1217d9a19c510d
     HEAD_REF master
     PATCHES
@@ -21,7 +16,8 @@ vcpkg_from_github(
       0010-fix-uwp-tiff-imgcodecs.patch
       0011-remove-python2.patch
       0012-fix-zlib.patch
-      fix-tbb-error.patch
+      0017-fix-tbb-error.patch
+      0019-fix-ffmpeg5.patch
 )
 # Disallow accidental build of vendored copies
 file(REMOVE_RECURSE "${SOURCE_PATH}/3rdparty/openexr")
@@ -68,6 +64,8 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
  "world"     BUILD_opencv_world
  "dc1394"    WITH_1394
 )
+
+set(USE_QT_VERSION "5")
 
 # Cannot use vcpkg_check_features() for "dnn", "gtk", ipp", "openmp", "ovis", "python", "qt", "tbb"
 set(BUILD_opencv_dnn OFF)

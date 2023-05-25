@@ -1,12 +1,7 @@
-file(READ "${CMAKE_CURRENT_LIST_DIR}/vcpkg.json" _contents)
-string(JSON OPENCV_VERSION GET "${_contents}" version)
-
-set(USE_QT_VERSION "6")
-
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO opencv/opencv
-    REF ${OPENCV_VERSION}
+    REF ${VERSION}
     SHA512 f799e1eb4ef1eb81212319cf908d0a64d2d5179c8da86b919b06e96a6870a9f3ed33251223a841b71711349018ea6782c174179fa59958a1573e22d11cc9347d
     FILE_DISAMBIGUATOR 1
     HEAD_REF master
@@ -43,38 +38,56 @@ string(COMPARE EQUAL "${VCPKG_CRT_LINKAGE}" "static" BUILD_WITH_STATIC_CRT)
 
 set(ADE_DIR ${CURRENT_INSTALLED_DIR}/share/ade CACHE PATH "Path to existing ADE CMake Config file")
 
+set(USE_QT_VERSION "6")
+
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
  FEATURES
- "ade"       WITH_ADE
- "contrib"   WITH_CONTRIB
- "cuda"      WITH_CUBLAS
- "cuda"      WITH_CUDA
- "cudnn"     WITH_CUDNN
- "dnn-cuda"  OPENCV_DNN_CUDA
- "eigen"     WITH_EIGEN
- "ffmpeg"    WITH_FFMPEG
- "freetype"  WITH_FREETYPE
- "gdcm"      WITH_GDCM
- "gstreamer" WITH_GSTREAMER
- "gtk"       WITH_GTK
- "halide"    WITH_HALIDE
- "jasper"    WITH_JASPER
- "jpeg"      WITH_JPEG
- "lapack"    WITH_LAPACK
- "nonfree"   OPENCV_ENABLE_NONFREE
- "openexr"   WITH_OPENEXR
- "opengl"    WITH_OPENGL
- "png"       WITH_PNG
- "quirc"     WITH_QUIRC
- "sfm"       BUILD_opencv_sfm
- "tiff"      WITH_TIFF
- "vtk"       WITH_VTK
- "webp"      WITH_WEBP
- "world"     BUILD_opencv_world
- "dc1394"    WITH_1394
+ "ade"            WITH_ADE
+ "calib3d"        BUILD_opencv_calib3d
+ "contrib"        WITH_CONTRIB
+ "cuda"           WITH_CUBLAS
+ "cuda"           WITH_CUDA
+ "cudnn"          WITH_CUDNN
+ "dc1394"         WITH_1394
+ "directx"        WITH_DIRECTX
+ "disable-fs"     OPENCV_DISABLE_FILESYSTEM_SUPPORT
+ "disable-thread" OPENCV_DISABLE_THREAD_SUPPORT
+ "dnn-cuda"       OPENCV_DNN_CUDA
+ "dshow"          WITH_DSHOW
+ "eigen"          WITH_EIGEN
+ "ffmpeg"         WITH_FFMPEG
+ "freetype"       WITH_FREETYPE
+ "gdcm"           WITH_GDCM
+ "gstreamer"      WITH_GSTREAMER
+ "gtk"            WITH_GTK
+ "halide"         WITH_HALIDE
+ "highgui"        BUILD_opencv_highgui
+ "intrinsics"     CV_ENABLE_INTRINSICS
+ "itt"            WITH_ITT
+ "jasper"         WITH_JASPER
+ "jpeg"           WITH_JPEG
+ "lapack"         WITH_LAPACK
+ "msmf"           WITH_MSMF
+ "nonfree"        OPENCV_ENABLE_NONFREE
+ "openexr"        WITH_OPENEXR
+ "opencl"         WITH_OPENCL
+ "opengl"         WITH_OPENGL
+ "pch"            ENABLE_PRECOMPILED_HEADERS
+ "png"            WITH_PNG
+ "quirc"          WITH_QUIRC
+ "sfm"            BUILD_opencv_sfm
+ "tiff"           WITH_TIFF
+ "vtk"            WITH_VTK
+ "webp"           WITH_WEBP
+ "win32-ui"       WITH_WIN32UI
+ "world"          BUILD_opencv_world
 )
 
-# Cannot use vcpkg_check_features() for "dnn", "gtk", ipp", "openmp", "ovis", "python", "qt", "tbb"
+set(WITH_OPENCLAMDBLAS OFF)
+set(WITH_OPENCLAMDFFT OFF)
+set(WITH_OPENCL_D3D11_NV OFF)
+
+# Cannot use vcpkg_check_features() for "dnn", ipp", "openmp", "ovis", "python", "qt", "tbb"
 set(BUILD_opencv_dnn OFF)
 if("dnn" IN_LIST FEATURES)
   if(NOT VCPKG_TARGET_IS_ANDROID)
@@ -374,6 +387,7 @@ vcpkg_cmake_configure(
         -DOPENCV_DLLVERSION=4
         -DOPENCV_DEBUG_POSTFIX=d
         -DOPENCV_GENERATE_SETUPVARS=OFF
+        -DENABLE_CONFIG_VERIFICATION=ON
         # Do not build docs/examples
         -DBUILD_DOCS=OFF
         -DBUILD_EXAMPLES=OFF
@@ -387,6 +401,7 @@ vcpkg_cmake_configure(
         -DBUILD_WEBP=OFF
         -DBUILD_ZLIB=OFF
         -DBUILD_TBB=OFF
+        -DBUILD_IPP_IW=${WITH_IPP}
         -DBUILD_ITT=OFF
         ###### Disable build 3rd party components
         -DBUILD_PROTOBUF=OFF
@@ -429,7 +444,6 @@ vcpkg_cmake_configure(
         -DWITH_OPENMP=${WITH_OPENMP}
         -DWITH_PROTOBUF=${BUILD_opencv_dnn}
         -DWITH_PYTHON=${WITH_PYTHON}
-        -DWITH_OPENCLAMDBLAS=OFF
         -DWITH_TBB=${WITH_TBB}
         -DWITH_OPENJPEG=OFF
         -DWITH_CPUFEATURES=OFF
@@ -444,7 +458,9 @@ vcpkg_cmake_configure(
         -DBUILD_opencv_rgbd=OFF
         ###### Additional build flags
         ${ADDITIONAL_BUILD_FLAGS}
-        -DBUILD_IPP_IW=${WITH_IPP}
+        -DWITH_OPENCLAMDBLAS=${WITH_OPENCLAMDBLAS}
+        -DWITH_OPENCLAMDFFT=${WITH_OPENCLAMDFFT}
+        -DWITH_OPENCL_D3D11_NV=${WITH_OPENCL_D3D11_NV}
 )
 
 vcpkg_cmake_install()
