@@ -2,7 +2,7 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO opencv/opencv
     REF ${VERSION}
-    SHA512 96bbeb9525325f17ba635a0b75126aae0a7b0daef211af45057a97abd5d31a57fc50f0e889a6dab614df9b7621a145e06c0d240f0a218f33df1217d9a19c510d
+    SHA512 45b4447a5312acefffb9b11a6d4e8d8e98c62dcec902e4589d91bb32e7b5bc6e5c6407881a9edcca7d97df598e3f70925e458b2772d991d64ed2cc82701441f8
     HEAD_REF master
     PATCHES
       0001-disable-downloading.patch
